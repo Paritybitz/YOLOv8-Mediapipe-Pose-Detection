@@ -1,3 +1,4 @@
+# Imports
 import cv2
 import os
 from ultralytics import YOLO
@@ -5,6 +6,9 @@ import mediapipe as mp
 import xml.etree.ElementTree as ET
 import string
 import random
+
+
+### Initialize Models
 
 # Load YOLOv8 model
 model_path = 'yolov8n.pt'  # Using a pre-trained YOLOv8 model
@@ -14,18 +18,24 @@ model = YOLO(model_path)
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=True, model_complexity=2, enable_segmentation=False, min_detection_confidence=0.5)
 
+
+### Directories
+
 # Directory to save results
 bbox_output_dir = 'C:/Users/alimo/OneDrive/Documents/FRT/YOLO MediaPipe Pose Detection/YOLOv8-Mediapipe-Pose-Detection/Output/Detected_Bbox'
 Handsup_output_dir = 'C:/Users/alimo/OneDrive/Documents/FRT/YOLO MediaPipe Pose Detection/YOLOv8-Mediapipe-Pose-Detection/Output/Hands_Up'
 xml_dir = 'C:/Users/alimo/OneDrive/Documents/FRT/YOLO MediaPipe Pose Detection/YOLOv8-Mediapipe-Pose-Detection/Output/XML_Files'
 
+# (Video) input directory
 video_dir = 'C:/Users/alimo/OneDrive/Documents/FRT/YOLO MediaPipe Pose Detection/YOLOv8-Mediapipe-Pose-Detection/Videos_data'  # Update with video path
 
 os.makedirs(Handsup_output_dir, exist_ok=True)
 os.makedirs(xml_dir, exist_ok=True)
 os.makedirs(bbox_output_dir, exist_ok=True)
 
-# Confidence threshold
+
+### Generate landmarks
+
 confidence_threshold = 0.5
 
 def get_pose_landmarks(image):
@@ -36,9 +46,14 @@ def get_pose_landmarks(image):
             return results.pose_landmarks
     return None
 
+
+### Define essential landmarks
+
 def classify_pose(landmarks):
     if not landmarks:
         return "No pose detected"
+    
+    # Landmark variable definitions
 
     landmarks_list = [landmark for landmark in landmarks.landmark]
 
@@ -53,6 +68,9 @@ def classify_pose(landmarks):
         return "Hands Up"
     else:
         return "Other Pose"
+
+
+### Creating XML Files for each image
 
 def create_xml_for_bounding_box(bounding_box, file_name, save_directory):
     """
@@ -126,74 +144,3 @@ def create_xml_for_bounding_box(bounding_box, file_name, save_directory):
     tree = ET.ElementTree(annotation)
     xml_file_name = os.path.join(save_directory, f"{file_name}.xml")
     tree.write(xml_file_name)
-    
-def detect_person(model, frame):
-    results = model.predict(frame)
-    detected_persons = []
-
-    for result in results:
-        boxes = result.boxes.xyxy.cpu().numpy()
-        scores = result.boxes.conf.cpu().numpy()
-        class_ids = result.boxes.cls.cpu().numpy()
-
-        for box, score, class_id in zip(boxes, scores, class_ids):
-            if class_id == 0 and score > confidence_threshold:  # Class 0 is 'person' in COCO dataset
-                x1, y1, x2, y2 = map(int, box)
-                height = y2 - y1
-                width = x2 - x1
-                center_x = (x1 + x2) // 2
-                x1 = center_x - height // 2
-                x2 = center_x + height // 2
-                x1 = max(0, x1)
-                x2 = min(frame.shape[1], x2)
-                cropped_person = frame[y1:y2, x1:x2]
-                landmarks = get_pose_landmarks(cropped_person)
-                pose_label = classify_pose(landmarks)
-                if pose_label == "Hands Up":
-                    print('Hands UP')
-                    detected_persons.append((box, score, class_id, pose_label))
-    return detected_persons
-
-def generate_random_name(length=8):
-    """ Generate a random string of letters and digits.
-    """
-    chars = string.ascii_letters + string.digits
-    return ''.join(random.choice(chars) for _ in range(length))
-
-def video_proscessor():
-    # Process each video
-    frame_counter = 0
-    count=0
-
-    for video_file in os.listdir(video_dir):
-        if video_file.endswith('.mp4'):
-            video_path = os.path.join(video_dir, video_file)
-            cap = cv2.VideoCapture(video_path)
-
-            while cap.isOpened():
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                count+=1
-                detected_persons = detect_person(model, frame)
-
-                for box, score, class_id, pose_label in detected_persons:
-                    
-                    file_name = f'{generate_random_name()}.jpg'
-                    file_path = os.path.join(Handsup_output_dir,file_name)
-                    cv2.imwrite(file_path, frame)
-                    
-                    x1, y1, x2, y2 = map(int, box)
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                    image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    bbox_file_path = os.path.join(bbox_output_dir, file_name)
-                    cv2.imwrite(bbox_file_path, image_rgb)
-
-                    # create_pascal_voc_annotation(file_name, frame.shape, bounding_boxes, xml_dir)
-                    create_xml_for_bounding_box(box, file_name.replace('.jpg', ''), xml_dir)
-                    frame_counter += 1
-                print(count)
-            cap.release()
-
-if __name__== '__main__':
-    video_proscessor()
