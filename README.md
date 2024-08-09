@@ -1,4 +1,4 @@
-# YOLOv8-Mediapipe-Pose-Detection
+# YOLOv8-Mediapipe-Pose-Detection 
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ce3626c6-f238-4e53-94eb-012e0b4eba99" alt="Image1" width="49%"/>
