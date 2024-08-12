@@ -35,10 +35,10 @@ pip install ultralytics
 pip install mediapipe
 ```
 ## Directory Structure
-- Videos_data: Directory containing input videos.
-- Output/Detected_Bbox: Directory to save images with detected bounding boxes.
-- Output/Hands_Up: Directory to save images with "Hands Up" pose.
-- Output/XML_Files: Directory to save XML annotations.
+- **Videos_data**: Directory containing input videos.
+- **Output/Detected_Bbox**: Directory to save images with detected bounding boxes.
+- **Output/Hands_Up**: Directory to save images with "Hands Up" pose.
+- **Output/XML_Files**: Directory to save XML annotations.
 
 ## In-Depth
 <p
