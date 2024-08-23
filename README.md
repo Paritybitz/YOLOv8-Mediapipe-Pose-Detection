@@ -9,7 +9,7 @@
 ## Overview
 <p
 
-The "YOLOv8-Mediapipe-Pose-Detection" project exemplifies a systematic and innovative approach to solving a complex computer vision problem, combining two powerful tools—YOLOv8 for object detection and MediaPipe for pose estimation. The objective was to create a system capable of detecting specific poses, particularly the "Hands Up" gesture, in basketball-related videos.
+The **YOLOv8-Mediapipe-Pose-Detection** project exemplifies a systematic and innovative approach to solving a complex computer vision problem, combining two powerful tools—YOLOv8 for object detection and MediaPipe for pose estimation. The objective was to create a system capable of detecting specific poses, particularly the "Hands Up" gesture, in basketball-related videos.
   
 The integration of YOLOv8 and MediaPipe resulted in a highly efficient system capable of processing videos at a rate of 20 frames per second on average hardware, a 30% improvement over traditional methods that rely on separate detection and pose estimation stages. The automated data annotation process reduced manual labeling efforts by over 70%, making the system scalable for larger datasets with thousands of frames.
 </p>
